@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Dossier{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-plus-circle text-primary"></i> Create New Dossier</h2>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-file-medical"></i> Dossier Information</h5>
+                </div>
+                <div class="card-body">
+                    <form id="dossier-form" method="POST" action="{{ url_for('create_dossier') }}">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="title" name="title" required
+                                           placeholder="Enter dossier title">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="indication" class="form-label">Indication <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="indication" name="indication" required
+                                           placeholder="Enter medical indication">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="product_name" class="form-label">Product Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="product_name" name="product_name" required
+                                           placeholder="Enter product name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="manufacturer" class="form-label">Manufacturer <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="manufacturer" name="manufacturer" required
+                                           placeholder="Enter manufacturer name">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4"
+                                      placeholder="Enter detailed description of the dossier"></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="therapeutic_area" class="form-label">Therapeutic Area <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="therapeutic_area" name="therapeutic_area" required>
+                                        <option value="">Select therapeutic area</option>
+                                        <option value="oncology">Oncology</option>
+                                        <option value="cardiology">Cardiology</option>
+                                        <option value="neurology">Neurology</option>
+                                        <option value="immunology">Immunology</option>
+                                        <option value="respiratory">Respiratory</option>
+                                        <option value="endocrinology">Endocrinology</option>
+                                        <option value="gastroenterology">Gastroenterology</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="development_phase" class="form-label">Development Phase <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="development_phase" name="development_phase" required>
+                                        <option value="">Select development phase</option>
+                                        <option value="preclinical">Preclinical</option>
+                                        <option value="phase_1">Phase I</option>
+                                        <option value="phase_2">Phase II</option>
+                                        <option value="phase_3">Phase III</option>
+                                        <option value="phase_4">Phase IV</option>
+                                        <option value="post_market">Post-Market</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="target_submission_date" class="form-label">Target Submission Date</label>
+                                    <input type="date" class="form-control" id="target_submission_date" name="target_submission_date">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="priority" class="form-label">Priority</label>
+                                    <select class="form-select" id="priority" name="priority">
+                                        <option value="low">Low</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="high">High</option>
+                                        <option value="critical">Critical</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Target HTA Agencies</label>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="nice" name="target_agencies" value="nice">
+                                        <label class="form-check-label" for="nice">NICE (UK)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="g_ba" name="target_agencies" value="g_ba">
+                                        <label class="form-check-label" for="g_ba">G-BA (Germany)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="has" name="target_agencies" value="has">
+                                        <label class="form-check-label" for="has">HAS (France)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="cadth" name="target_agencies" value="cadth">
+                                        <label class="form-check-label" for="cadth">CADTH (Canada)</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" onclick="history.back()">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Create Dossier
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="fas fa-info-circle"></i> Guidelines</h6>
+                </div>
+                <div class="card-body">
+                    <h6><i class="fas fa-lightbulb text-warning"></i> Tips for Creating a Dossier</h6>
+                    <ul class="small">
+                        <li>Use a clear, descriptive title that includes the product name and indication</li>
+                        <li>Select the appropriate therapeutic area and development phase</li>
+                        <li>Consider target submission timelines when setting priority</li>
+                        <li>Include relevant HTA agencies for your target markets</li>
+                    </ul>
+                    
+                    <hr>
+                    
+                    <h6><i class="fas fa-exclamation-triangle text-warning"></i> Required Fields</h6>
+                    <p class="small text-muted">
+                        Fields marked with <span class="text-danger">*</span> are required to create the dossier.
+                        You can always update this information later.
+                    </p>
+                    
+                    <hr>
+                    
+                    <h6><i class="fas fa-clock text-info"></i> Next Steps</h6>
+                    <p class="small text-muted">
+                        After creating the dossier, you'll be able to:
+                    </p>
+                    <ul class="small text-muted">
+                        <li>Add clinical evidence</li>
+                        <li>Configure economic models</li>
+                        <li>Prepare HTA submissions</li>
+                        <li>Generate reports</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-3">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0"><i class="fas fa-rocket"></i> Quick Start</h6>
+                </div>
+                <div class="card-body">
+                    <p class="small">Need help getting started?</p>
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-outline-success btn-sm" onclick="loadTemplate('oncology')">
+                            <i class="fas fa-template"></i> Use Oncology Template
+                        </button>
+                        <button type="button" class="btn btn-outline-success btn-sm" onclick="loadTemplate('cardiology')">
+                            <i class="fas fa-template"></i> Use Cardiology Template
+                        </button>
+                        <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#helpModal">
+                            <i class="fas fa-question-circle"></i> View Help
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Help Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="helpModalLabel">
+                    <i class="fas fa-question-circle"></i> Dossier Creation Help
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>What is a Dossier?</h6>
+                <p>A dossier is a comprehensive document package that contains all the necessary information for health technology assessment (HTA) submissions.</p>
+                
+                <h6>Key Components</h6>
+                <ul>
+                    <li><strong>Clinical Evidence:</strong> Data from clinical trials and studies</li>
+                    <li><strong>Economic Evidence:</strong> Cost-effectiveness and budget impact analyses</li>
+                    <li><strong>HTA Submissions:</strong> Regulatory submissions to HTA agencies</li>
+                </ul>
+                
+                <h6>Best Practices</h6>
+                <ul>
+                    <li>Start with a clear scope and objectives</li>
+                    <li>Gather all relevant evidence systematically</li>
+                    <li>Consider regional requirements early</li>
+                    <li>Plan for iterative updates and reviews</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.getElementById('dossier-form');
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Basic validation
+        const requiredFields = form.querySelectorAll('[required]');
+        let valid = true;
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                valid = false;
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+        
+        if (valid) {
+            // Show loading state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+            submitBtn.disabled = true;
+            
+            // Submit form
+            setTimeout(() => {
+                form.submit();
+            }, 500);
+        } else {
+            // Show error message
+            showAlert('Please fill in all required fields.', 'danger');
+        }
+    });
+    
+    // Template loading functions
+    window.loadTemplate = function(type) {
+        const templates = {
+            oncology: {
+                title: 'Oncology Treatment Dossier',
+                therapeutic_area: 'oncology',
+                development_phase: 'phase_3',
+                description: 'Comprehensive dossier for oncology treatment evaluation including clinical efficacy, safety, and economic impact assessment.'
+            },
+            cardiology: {
+                title: 'Cardiovascular Treatment Dossier', 
+                therapeutic_area: 'cardiology',
+                development_phase: 'phase_3',
+                description: 'Detailed dossier for cardiovascular treatment assessment including clinical outcomes, safety profile, and health economic evaluation.'
+            }
+        };
+        
+        const template = templates[type];
+        if (template) {
+            Object.keys(template).forEach(key => {
+                const field = document.getElementById(key);
+                if (field) {
+                    field.value = template[key];
+                }
+            });
+            showAlert(`${type.charAt(0).toUpperCase() + type.slice(1)} template loaded successfully!`, 'success');
+        }
+    };
+    
+    // Alert function
+    window.showAlert = function(message, type = 'info') {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        
+        const container = document.querySelector('.container-fluid');
+        container.insertBefore(alertDiv, container.firstChild);
+        
+        // Auto dismiss after 5 seconds
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000);
+    };
+});
+</script>
+{% endblock %}

@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - MedAI Dossier{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-dashboard me-2"></i>Dashboard</h1>
+            <a href="{{ url_for('create_dossier') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>New Dossier
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Total Dossiers</div>
+                        <div class="h5 mb-0 font-weight-bold">{{ stats.get('total_dossiers', 0) }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-folder-open fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Draft</div>
+                        <div class="h5 mb-0 font-weight-bold">{{ stats.get('draft_count', 0) }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-edit fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">In Review</div>
+                        <div class="h5 mb-0 font-weight-bold">{{ stats.get('in_review_count', 0) }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-search fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Submitted</div>
+                        <div class="h5 mb-0 font-weight-bold">{{ stats.get('submitted_count', 0) }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-check fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Dossiers -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-clock me-2"></i>Recent Dossiers
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if dossiers %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Framework</th>
+                                    <th>Product</th>
+                                    <th>Status</th>
+                                    <th>Last Updated</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dossier in dossiers[:5] %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('dossier_detail', dossier_id=dossier.id) }}" 
+                                           class="text-decoration-none">
+                                            {{ dossier.title }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ dossier.hta_framework.upper() }}</span>
+                                    </td>
+                                    <td>{{ dossier.product_profile.product_name if dossier.product_profile else 'N/A' }}</td>
+                                    <td>
+                                        {% set status_class = {
+                                            'draft': 'warning',
+                                            'in_review': 'info',
+                                            'approved': 'success',
+                                            'submitted': 'primary',
+                                            'published': 'success',
+                                            'archived': 'secondary'
+                                        } %}
+                                        <span class="badge bg-{{ status_class.get(dossier.status, 'secondary') }}">
+                                            {{ dossier.status.replace('_', ' ').title() }}
+                                        </span>
+                                    </td>
+                                    <td>{{ dossier.updated_at.strftime('%Y-%m-%d %H:%M') if dossier.updated_at else 'N/A' }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ url_for('dossier_detail', dossier_id=dossier.id) }}" 
+                                               class="btn btn-outline-primary btn-sm" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button class="btn btn-outline-secondary btn-sm" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-sm" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    {% if dossiers|length > 5 %}
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('dossiers_list') }}" class="btn btn-outline-primary">
+                            View All Dossiers
+                        </a>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No dossiers found</h5>
+                        <p class="text-muted">Get started by creating your first value dossier.</p>
+                        <a href="{{ url_for('create_dossier') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Create Dossier
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-lg-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-plus fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Create Dossier</h5>
+                <p class="card-text">Start a new value dossier for your pharmaceutical product.</p>
+                <a href="{{ url_for('create_dossier') }}" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-microscope fa-3x text-success mb-3"></i>
+                <h5 class="card-title">Manage Evidence</h5>
+                <p class="card-text">Upload and organize clinical evidence and study data.</p>
+                <a href="{{ url_for('evidence_management') }}" class="btn btn-success">View Evidence</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-globe fa-3x text-info mb-3"></i>
+                <h5 class="card-title">HTA Frameworks</h5>
+                <p class="card-text">Explore supported HTA frameworks and requirements.</p>
+                <a href="{{ url_for('hta_frameworks') }}" class="btn btn-info">Explore</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
