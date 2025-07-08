@@ -12,7 +12,7 @@ import sys
 # Add src to path for imports
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
-from components import dossier_management, evidence_tracking, economics_view
+from components import dossier_management, evidence_tracking, economics_view, value_dossier_structure, dossier_detail_edit, template_management, template_preview, template_editor
 from utils.session_state import initialize_session_state
 from utils.navigation import setup_navigation
 
@@ -47,10 +47,20 @@ def main() -> None:
     
     if page == "dossier_management":
         dossier_management.render()
+    elif page == "value_dossier_structure":
+        value_dossier_structure.render()
     elif page == "evidence_tracking":
         evidence_tracking.render()
     elif page == "economics_view":
         economics_view.render()
+    elif page == "dossier_edit":
+        dossier_detail_edit.render()
+    elif page == "template_management":
+        template_management.render()
+    elif page == "template_preview":
+        template_preview.render()
+    elif page == "template_editor":
+        template_editor.render()
     else:
         st.error(f"Unknown page: {page}")
 

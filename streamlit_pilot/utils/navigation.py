@@ -13,8 +13,11 @@ def setup_navigation() -> None:
     
     # Navigation options
     nav_options = {
-        "🗂️ Dossier Management": "dossier_management",
-        "📊 Evidence Tracking": "evidence_tracking", 
+        "🏠 Dashboard": "dashboard",
+        "🗂️ Dossier Management": "dossier_management", 
+        "📊 Value Dossier Structure": "value_dossier_structure",
+        "🗂️ Template Management": "template_management",
+        "🔬 Evidence Tracking": "evidence_tracking",
         "💰 Economics View": "economics_view"
     }
     

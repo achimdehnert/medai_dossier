@@ -153,6 +153,135 @@ def render_create_dossier() -> None:
     st.subheader("➕ Create New Dossier")
     
     with st.form("create_dossier_form"):
+        # Template Selection
+        st.markdown("### 🗂️ Template Selection")
+        
+        # Get available templates
+        templates = get_session_data("templates", {})
+        template_options = {"default": "📄 Standard Dossier (Ohne Template)"}
+        
+        # Debug info
+        st.write(f"🔍 Debug: {len(templates)} Templates gefunden")
+        
+        # Add predefined templates if no custom templates exist
+        if not templates:
+            # Initialize with default HTA template
+            default_templates = {
+                "hta_template": {
+                    "name": "HTA Template",
+                    "category": "HTA",
+                    "description": "Standard Health Technology Assessment Template",
+                    "sections": {
+                        "executive_summary": {
+                            "title": "Executive Summary",
+                            "description": "High-level overview of the assessment",
+                            "icon": "📊",
+                            "required": True,
+                            "order": 1
+                        },
+                        "clinical_evidence": {
+                            "title": "Clinical Evidence",
+                            "description": "Clinical trial data and evidence",
+                            "icon": "🎦",
+                            "required": True,
+                            "order": 2
+                        },
+                        "economic_evaluation": {
+                            "title": "Economic Evaluation",
+                            "description": "Cost-effectiveness analysis",
+                            "icon": "💰",
+                            "required": True,
+                            "order": 3
+                        },
+                        "budget_impact": {
+                            "title": "Budget Impact",
+                            "description": "Impact on healthcare budget",
+                            "icon": "📈",
+                            "required": False,
+                            "order": 4
+                        }
+                    },
+                    "created_date": datetime.now().isoformat(),
+                    "is_predefined": True
+                },
+                "regulatory_template": {
+                    "name": "Regulatory Submission",
+                    "category": "Regulatory",
+                    "description": "Template for regulatory authority submissions",
+                    "sections": {
+                        "product_info": {
+                            "title": "Product Information",
+                            "description": "Basic product details",
+                            "icon": "📝",
+                            "required": True,
+                            "order": 1
+                        },
+                        "safety_data": {
+                            "title": "Safety Data",
+                            "description": "Safety and adverse events",
+                            "icon": "🛡️",
+                            "required": True,
+                            "order": 2
+                        },
+                        "efficacy_data": {
+                            "title": "Efficacy Data",
+                            "description": "Clinical efficacy results",
+                            "icon": "🎦",
+                            "required": True,
+                            "order": 3
+                        }
+                    },
+                    "created_date": datetime.now().isoformat(),
+                    "is_predefined": True
+                }
+            }
+            
+            # Save default templates to session
+            set_session_data("templates", default_templates)
+            templates = default_templates
+            st.info("🎆 Standard-Templates wurden initialisiert!")
+        
+        # Build template options
+        for template_id, template_data in templates.items():
+            template_name = template_data.get('name', 'Unbenannt')
+            template_category = template_data.get('category', '')
+            display_name = f"🗂️ {template_name}"
+            if template_category:
+                display_name += f" ({template_category})"
+            template_options[template_id] = display_name
+        
+        st.write(f"📊 Verfügbare Template-Optionen: {list(template_options.keys())}")
+        
+        selected_template = st.selectbox(
+            "Template für neues Dossier auswählen",
+            options=list(template_options.keys()),
+            format_func=lambda x: template_options[x],
+            index=0,
+            help="Wählen Sie ein Template, um die Struktur des neuen Dossiers zu definieren"
+        )
+        
+        # Show template preview if selected
+        if selected_template != "default":
+            template_data = templates.get(selected_template, {})
+            template_sections = template_data.get('sections', {})
+            
+            if template_sections:
+                with st.expander(f"📋 Template-Vorschau: {template_data.get('name', 'Unbenannt')}"):
+                    st.markdown(f"**Kategorie:** {template_data.get('category', 'Unbekannt')}")
+                    if template_data.get('description'):
+                        st.markdown(f"**Beschreibung:** {template_data.get('description')}")
+                    
+                    st.markdown("**Enthaltene Sektionen:**")
+                    sorted_sections = sorted(template_sections.items(), key=lambda x: x[1].get('order', 999))
+                    
+                    for section_id, section_data in sorted_sections:
+                        icon = section_data.get('icon', '📄')
+                        title = section_data.get('title', 'Unbenannt')
+                        required = "✅ Erforderlich" if section_data.get('required', False) else "⚪ Optional"
+                        st.markdown(f"- {icon} **{title}** ({required})")
+        
+        st.divider()
+        
         # Basic information
         st.markdown("### 📝 Basic Information")
         
@@ -209,7 +338,8 @@ def render_create_dossier() -> None:
                     "primary_author": primary_author,
                     "medical_writer": medical_writer,
                     "regulatory_contact": regulatory_contact,
-                    "project_manager": project_manager
+                    "project_manager": project_manager,
+                    "selected_template": selected_template if selected_template != "default" else None
                 })
 
 
@@ -328,6 +458,35 @@ def create_new_dossier(dossier_data: Dict[str, Any]) -> None:
     # Generate unique ID
     dossier_id = str(uuid.uuid4())
     
+    # Apply template structure if selected
+    template_structure = {}
+    selected_template = dossier_data.get('selected_template')
+    
+    if selected_template:
+        templates = get_session_data("templates", {})
+        template_data = templates.get(selected_template, {})
+        template_sections = template_data.get('sections', {})
+        
+        # Create dossier structure based on template
+        for section_id, section_data in template_sections.items():
+            template_structure[section_id] = {
+                'title': section_data.get('title', 'Unbenannt'),
+                'description': section_data.get('description', ''),
+                'icon': section_data.get('icon', '📄'),
+                'required': section_data.get('required', False),
+                'order': section_data.get('order', 1),
+                'content': '',  # Empty content for new dossier
+                'completion_status': 'Not Started',
+                'last_updated': datetime.now().isoformat(),
+                'documents': [],
+                'notes': ''
+            }
+        
+        # Store template info in dossier
+        dossier_data['template_id'] = selected_template
+        dossier_data['template_name'] = template_data.get('name', 'Unbekannt')
+        dossier_data['template_category'] = template_data.get('category', '')
+    
     # Add metadata
     dossier_data.update({
         "created_date": datetime.now().isoformat(),
@@ -336,7 +495,8 @@ def create_new_dossier(dossier_data: Dict[str, Any]) -> None:
         "evidence_items": [],
         "economics_data": {},
         "timeline": [],
-        "documents": []
+        "documents": [],
+        "structure": template_structure  # Apply template structure
     })
     
     # Save to session state
@@ -344,8 +504,14 @@ def create_new_dossier(dossier_data: Dict[str, Any]) -> None:
     dossiers[dossier_id] = dossier_data
     set_session_data("dossiers", dossiers)
     
-    # Show success message
-    show_success_message(f"✅ Dossier '{dossier_data['title']}' created successfully!")
+    # Show success message with template info
+    template_info = ""
+    if selected_template:
+        template_name = dossier_data.get('template_name', 'Unbekannt')
+        section_count = len(template_structure)
+        template_info = f" (Template: {template_name}, {section_count} Sektionen)"
+    
+    show_success_message(f"✅ Dossier '{dossier_data['title']}' erfolgreich erstellt!{template_info}")
     
     # Switch to list view
     st.rerun()
